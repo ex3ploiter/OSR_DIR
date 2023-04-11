@@ -1,100 +1,49 @@
 import torch
-import os
+
 import numpy as np
 from torchvision.datasets import ImageFolder
-import torch
-from torchvision.datasets import ImageFolder
-import torch
-from torchvision.datasets import CIFAR100
-from torchvision.datasets import CIFAR10
+
+
+
+
 from torchvision import transforms
 from torchvision.datasets import FashionMNIST
-from torchvision.models import resnet
-import torchvision.datasets as datasets
+
 import torchvision.transforms as transforms
-from torch.utils.data.dataset import Dataset 
+
 import numpy as np
-import time
+
 from torch.utils.data import DataLoader
-import torchvision
-from PIL import Image
-import glob
-import os
-import shutil
-from glob import glob
-import os
-import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-import zipfile
-
-
-
 import torch
 from tqdm import tqdm
 from sklearn.metrics import roc_auc_score
 from torchattacks import FGSM ,AutoAttack
- 
 from torchvision.utils import save_image
 from torchvision.utils import make_grid
 import os
 import numpy as np
-from torchvision.datasets import ImageFolder
 import torch
-from torchvision.datasets import ImageFolder
 import torch
-from torchvision.datasets import CIFAR100
-from torchvision.datasets import CIFAR10
 from torchvision import transforms
 from torchvision.datasets import FashionMNIST
-from torchvision.models import resnet
-import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-from torch.utils.data.dataset import Dataset 
 import numpy as np
-import time
 from torch.utils.data import DataLoader
-import torchvision
-from PIL import Image
-import glob
 import os
-import shutil
-from glob import glob
 import os
-import pandas as pd 
 import numpy as np
-import glob
 import os
-import shutil
-from glob import glob
 from torch.utils.data import DataLoader
-import torchvision
-from PIL import Image
-import glob
 import os
-import shutil
-from glob import glob
-import os
-import pandas as pd 
 import numpy as np
-from torch.utils.data import Dataset
-from glob import glob
-import torch
-from PIL import Image
 from torchvision import transforms
-import random
- 
-from torch.utils.data import Dataset
-from glob import glob
 import numpy as np
 import matplotlib.pyplot as plt
 from torchvision.datasets import FashionMNIST
-from torchvision.datasets import MNIST
-import torch
-import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
-from torchvision.datasets import CIFAR10 
 
 
 
@@ -200,7 +149,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
  
  
 def auc_softmax_adversarial(model, test_loader, test_attack, num_classes):
-
+    
   soft = torch.nn.Softmax(dim=1)
   anomaly_scores = []
   test_labels = []
@@ -212,15 +161,14 @@ def auc_softmax_adversarial(model, test_loader, test_attack, num_classes):
       
       data, target = data.to(device), target.to(device)
       labels = target.to(device)
-      adv_data =  attack(data, target)
+      adv_data =  test_attack(data, target)
       output = model(adv_data)
       probs = soft(output).squeeze()
       anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
       test_labels += target.detach().cpu().numpy().tolist()
 
-  
-  test_labels = [1 if lbl == 6 else 0 for lbl in test_labels]
-  
+  test_labels = [t == num_classes for t in test_labels]
+  #print(test_labels)
   auc = roc_auc_score(test_labels, anomaly_scores)
   print(f'AUC Adversairal - Softmax - score on epoch {epoch} is: {auc * 100}')
   return auc
@@ -241,10 +189,11 @@ def auc_softmax(model, test_loader, num_classes):
         anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
         test_labels += target.detach().cpu().numpy().tolist()
 #epoch
-  
-  test_labels = [1 if lbl == 6 else 0 for lbl in test_labels]
-  
+  #print(test_labels)
+  #print(num_classes)
+  test_labels = [t == num_classes for t in test_labels]
+  #print(test_labels)
   auc = roc_auc_score(test_labels, anomaly_scores)
   print(f'AUC - Softmax - score on  is: {auc * 100}')
   
-  return auc    
+  return auc

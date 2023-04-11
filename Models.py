@@ -1,13 +1,9 @@
-import matplotlib.pyplot as plt
+
+
 import torch
-import torchvision
-from torchvision import transforms
-from torch.utils.data import DataLoader
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from torchvision import models
+from preactresnet import preactresnet as preactresnet
+
 
 
 _mean = (0.485, 0.456, 0.406)
@@ -24,12 +20,12 @@ class Model(torch.nn.Module):
         self.model = None
         if model == 'resnet18':
             self.model =models.resnet18(pretrained=False)
-            # checkpoint = torch.load("/mnt/new_drive/ExposureExperiment/notebooks/resnet18_linf_eps8.0.ckpt")
-            # state_dict_path = 'model'
-            # sd = checkpoint[state_dict_path]
-            # sd = {k[len('module.'):]:v for k,v in sd.items()}
-            # sd_t = {k[len('attacker.model.'):]:v for k,v in sd.items() if k.split('.')[0]=='attacker' and k.split('.')[1]!='normalize'}
-            # self.model.load_state_dict(sd_t)
+            checkpoint = torch.load("./resnet18_linf_eps8.0.ckpt")
+            state_dict_path = 'model'
+            sd = checkpoint[state_dict_path]
+            sd = {k[len('module.'):]:v for k,v in sd.items()}
+            sd_t = {k[len('attacker.model.'):]:v for k,v in sd.items() if k.split('.')[0]=='attacker' and k.split('.')[1]!='normalize'}
+            self.model.load_state_dict(sd_t)
             self.model.fc = torch.nn.Identity()
             self.model.fc__ = torch.nn.Linear(512, 7)
 
@@ -56,6 +52,13 @@ class Model(torch.nn.Module):
             self.model.load_state_dict(sd_t)
             self.model.fc = torch.nn.Identity()
             self.model.fc__ = torch.nn.Linear(2048, 7)
+
+        if model == 'preactresnet_18':
+            self.model = preactresnet.PreActResNet18()
+            self.model.load_state_dict(sd_t)
+            self.model.fc = torch.nn.Identity()
+            self.model.fc__ = torch.nn.Linear(2048, 7)
+
 
 
   

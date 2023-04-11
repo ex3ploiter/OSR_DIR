@@ -1,47 +1,13 @@
 import torch
 import os
-import numpy as np
-from torchvision.datasets import ImageFolder
-import torch
-from torchvision.datasets import ImageFolder
-import torch
-from torchvision.datasets import CIFAR100
-from torchvision.datasets import CIFAR10
-from torchvision import transforms
-from torchvision.datasets import FashionMNIST
-from torchvision.models import resnet
-import torchvision.datasets as datasets
-import torchvision.transforms as transforms
-from torch.utils.data.dataset import Dataset 
-import numpy as np
-import time
-
-from torch.utils.data import DataLoader
-import torchvision
-from PIL import Image
-import glob
-import os
-import shutil
-from glob import glob
-import os
 import pandas as pd 
-import numpy as np
-import matplotlib.pyplot as plt
-import zipfile
-import matplotlib.pyplot as plt
-import torch
-import torchvision
-from torchvision import transforms
-from torch.utils.data import DataLoader
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchvision import models
 import pandas as pd 
 import json
 
-from utils import MyDataset_Binary,auc_softmax,auc_softmax_adversarial,getLoaders
+from utils import auc_softmax,auc_softmax_adversarial,getLoaders
 from Attack import TestTimePGD
 import torch.optim as optim
 from Models import Model
@@ -69,16 +35,16 @@ def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,atta
     
     attack_train = TrainTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps)
     attack_test = TestTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps, num_classes=6)
-    
     optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00005)
+    
     
     clean_auc=[]
     adv_auc=[]
     
-    for epoch in range(num_epoches):
+    for epoch in range(30):
             total_loss, total_num = 0.0, 0
             loss = nn.CrossEntropyLoss()
-            train_bar =  tqdm(train_loader, desc='Train  Binary Classifier ...')
+            train_bar =  tqdm(train_loader, desc='Train   Binary Classifier ...')
             for (img1, Y ) in train_bar:
                 model.train()
                 #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
@@ -95,7 +61,7 @@ def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,atta
                 train_bar.set_description(' Epoch :  {} ,   Loss: {:.4f}'.format(epoch ,  total_loss / total_num))
             #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
             auc=auc_softmax(model, test_loader, num_classes=6 )
-            auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)    
+            auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)            
             
             clean_auc.append(auc)
             adv_auc.append(auc_adv)
@@ -135,7 +101,7 @@ labels_to_test=[
  (9, 2, 3, 6, 7, 0)]
 
 
-model = Model('resnet18').cuda() #'resnet18'   'resnet50' 'wide_resnet50_2'
+model = Model('preactresnet_18').cuda() #'resnet18'   'resnet50' 'wide_resnet50_2'
 
 attack_eps = 8/255
 attack_steps = 10

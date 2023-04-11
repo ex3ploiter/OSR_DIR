@@ -505,7 +505,6 @@ class Attack(object):
             for subname, subvalue in value.__dict__.get('_attacks').items():
                 attacks[name+"."+subname] = subvalue
                 
-                
 import torch
 import torch.nn as nn
 
