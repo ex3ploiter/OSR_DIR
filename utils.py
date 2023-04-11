@@ -102,7 +102,7 @@ class MyDataset_Binary(torch.utils.data.Dataset):
 
 
 def getTrainSet(labelsToKeep):
-    Fashion_train =FashionMNIST('./Dataset', train=True, download=True, transform=transform_32)
+    Fashion_train =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST', train=True, download=False, transform=transform_32)
     #######
     train_labels=[]
     images_train=[]
@@ -119,7 +119,7 @@ def getTrainSet(labelsToKeep):
     
                 
 def getTestSet(labelsToKeep):
-    Fashion_test =FashionMNIST('./Dataset', train=False, download=True, transform=transform_32)
+    Fashion_test =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST', train=False, download=False, transform=transform_32)
 
     test_labels=[]
     images_test=[]
@@ -139,8 +139,8 @@ def getTestSet(labelsToKeep):
     return test_data_set_
 
 def getLoaders(labelsToKeep):
-    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=64, shuffle=True)
-    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=128, shuffle=False)
+    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=8, shuffle=True)
+    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=8, shuffle=False)
     
     return train_loader,test_loader
     
@@ -166,11 +166,14 @@ def auc_softmax_adversarial(model, test_loader, test_attack, num_classes):
       probs = soft(output).squeeze()
       anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
       test_labels += target.detach().cpu().numpy().tolist()
+      
+      
+      
 
   test_labels = [t == num_classes for t in test_labels]
   #print(test_labels)
   auc = roc_auc_score(test_labels, anomaly_scores)
-  print(f'AUC Adversairal - Softmax - score on epoch {epoch} is: {auc * 100}')
+  print(f'AUC Adversairal - Softmax - score is: {auc * 100}')
   return auc
 
 def auc_softmax(model, test_loader, num_classes):
@@ -188,6 +191,10 @@ def auc_softmax(model, test_loader, num_classes):
         probs = soft(output).squeeze()
         anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
         test_labels += target.detach().cpu().numpy().tolist()
+        
+        
+        
+        
 #epoch
   #print(test_labels)
   #print(num_classes)

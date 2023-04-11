@@ -59,9 +59,16 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
                 total_num += train_loader.batch_size
                 total_loss += loss_.item() * train_loader.batch_size
                 train_bar.set_description(' Epoch :  {} ,   Loss: {:.4f}'.format(epoch ,  total_loss / total_num))
+                
+                
+                
+                
             #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
             auc=auc_softmax(model, test_loader, num_classes=6 )
             auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)            
+            
+            
+            
             
             clean_auc.append(auc)
             adv_auc.append(auc_adv)
@@ -82,7 +89,10 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
         'attack_alpha': attack_alpha,
         'num_epoches': num_epoches,
         'Loss': total_loss / total_num,   
-        'labels_to_test': labelsToKeep
+        'labels_to_test': labelsToKeep,
+        'clean_auc':clean_auc,
+        'adv_auc':adv_auc
+        
     }
 
 
@@ -113,4 +123,5 @@ attack_alpha=0.00784313725490196
 for idx,labelsToKeep in enumerate(labels_to_test):
     
     train_loader,test_loader=getLoaders(labelsToKeep)
-    TrainAndTest(idx=idx,labelsToKeep=labelsToKeep,model=model,train_loader=train_loader,test_loader=test_loader,attack_eps=attack_eps,attack_alpha=attack_alpha,attack_steps=attack_steps,num_epoches=30)
+    TrainAndTest(idx=idx,labelsToKeep=labelsToKeep,model=model,train_loader=train_loader,test_loader=test_loader
+                 ,attack_eps=attack_eps,attack_alpha=attack_alpha,attack_steps=attack_steps,num_epoches=30)
