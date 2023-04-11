@@ -2,7 +2,8 @@
 
 import torch
 from torchvision import models
-from preactresnet import preactresnet as preactresnet
+import preactresnet
+
 
 
 
@@ -54,13 +55,8 @@ class Model(torch.nn.Module):
             self.model.fc__ = torch.nn.Linear(2048, 7)
 
         if model == 'preactresnet_18':
-            self.model = preactresnet.PreActResNet18()
-            self.model.load_state_dict(sd_t)
-            self.model.fc = torch.nn.Identity()
-            self.model.fc__ = torch.nn.Linear(2048, 7)
-
-
-
+            self.model = preactresnet.preactresnet18()
+            
   
     def forward(self, x):
         x = self.norm(x)
