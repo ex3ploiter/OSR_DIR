@@ -30,7 +30,7 @@ TrainTimePGD = PGD #(fln)
 
 
 
-def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,attack_alpha,num_epoches):
+def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,attack_steps,attack_alpha,num_epoches):
 
     
     attack_train = TrainTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps)
@@ -41,7 +41,7 @@ def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,atta
     clean_auc=[]
     adv_auc=[]
     
-    for epoch in range(30):
+    for epoch in range(num_epoches):
             total_loss, total_num = 0.0, 0
             loss = nn.CrossEntropyLoss()
             train_bar =  tqdm(train_loader, desc='Train   Binary Classifier ...')
@@ -81,7 +81,8 @@ def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,atta
         'attack_steps': attack_steps,
         'attack_alpha': attack_alpha,
         'num_epoches': num_epoches,
-        'Loss': total_loss / total_num   
+        'Loss': total_loss / total_num,   
+        'labels_to_test': labelsToKeep
     }
 
 
@@ -101,7 +102,9 @@ labels_to_test=[
  (9, 2, 3, 6, 7, 0)]
 
 
-model = Model('preactresnet_18').cuda() #'resnet18'   'resnet50' 'wide_resnet50_2'
+# preactresnet_18
+
+model = Model('preactresnet_18').cuda() #'resnet18'    'resnet50' 'wide_resnet50_2'
 
 attack_eps = 8/255
 attack_steps = 10
@@ -110,4 +113,4 @@ attack_alpha=0.00784313725490196
 for idx,labelsToKeep in enumerate(labels_to_test):
     
     train_loader,test_loader=getLoaders(labelsToKeep)
-    TrainAndTest(idx=idx,model=model,train_loader=train_loader,test_loader=test_loader,attack_eps=attack_eps,attack_alpha=attack_alpha,attack_steps=attack_steps,num_epoches=30)
+    TrainAndTest(idx=idx,labelsToKeep=labelsToKeep,model=model,train_loader=train_loader,test_loader=test_loader,attack_eps=attack_eps,attack_alpha=attack_alpha,attack_steps=attack_steps,num_epoches=30)
