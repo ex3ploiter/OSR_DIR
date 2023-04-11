@@ -61,7 +61,7 @@ class Model(torch.nn.Module):
     def forward(self, x):
         x = self.norm(x)
         z1 = self.model(x)
-        z2 = self.model.fc__(z1)
+        # z2 = self.model.fc__(z1)
  
-        return z2
+        return z1
 
