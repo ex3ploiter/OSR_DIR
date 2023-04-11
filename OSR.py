@@ -15,6 +15,7 @@ import torchvision.transforms as transforms
 from torch.utils.data.dataset import Dataset 
 import numpy as np
 import time
+
 from torch.utils.data import DataLoader
 import torchvision
 from PIL import Image
@@ -121,7 +122,8 @@ def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,atta
             
 
 
-labels_to_test=[(0, 1, 2, 3, 4, 5),
+labels_to_test=[
+    (0, 1, 2, 3, 4, 5),
  (1, 3, 9, 2, 7, 0),
  (2, 6, 8, 4, 3, 0),
  (3, 9, 6, 7, 0, 1),

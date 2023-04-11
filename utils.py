@@ -193,6 +193,8 @@ def getLoaders(labelsToKeep):
     train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=64, shuffle=True)
     test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=128, shuffle=False)
     
+    return train_loader,test_loader
+    
     
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
  
