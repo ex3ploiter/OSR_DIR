@@ -66,8 +66,10 @@ TrainTimePGD = PGD #(fln)
 
 def TrainAndTest(idx,model,train_loader,test_loader,attack_eps,attack_steps,attack_alpha,num_epoches):
 
+    
     attack_train = TrainTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps)
     attack_test = TestTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps, num_classes=6)
+    
     optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00005)
     
     clean_auc=[]
@@ -142,4 +144,4 @@ attack_alpha=0.00784313725490196
 for idx,labelsToKeep in enumerate(labels_to_test):
     
     train_loader,test_loader=getLoaders(labelsToKeep)
-    TrainAndTest(idx=idx,model=model,train_loader=train_loader,test_loader=test_loader,attack_eps=attack_eps,attack_alpha=attack_steps,attack_steps=attack_alpha,num_epoches=30)
+    TrainAndTest(idx=idx,model=model,train_loader=train_loader,test_loader=test_loader,attack_eps=attack_eps,attack_alpha=attack_alpha,attack_steps=attack_steps,num_epoches=30)
