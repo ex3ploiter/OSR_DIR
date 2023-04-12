@@ -41,55 +41,55 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
     optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00005)
 
     for epoch in range(num_epoches):
-            total_loss, total_num = 0.0, 0
-            loss = nn.CrossEntropyLoss()
-            train_bar =  tqdm(train_loader, desc='Train   Binary Classifier ...')
-            for (img1, Y ) in train_bar:
-                model.train()
-                #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
-                adv_data = attack_train(img1, Y)
-                optimizer.zero_grad()            
-                out_1 = model(adv_data.cuda()) 
-                loss_ = loss(out_1,Y.cuda())  
-                loss_.backward()
-                optimizer.step()
-                total_num += adv_data.size(0)
-                total_loss += loss_.item() * adv_data.size(0)
-                total_num += train_loader.batch_size
-                total_loss += loss_.item() * train_loader.batch_size
-                train_bar.set_description(' Epoch :  {} ,   Loss: {:.4f}'.format(epoch ,  total_loss / total_num))
+        total_loss, total_num = 0.0, 0
+        loss = nn.CrossEntropyLoss()
+        train_bar =  tqdm(train_loader, desc='Train   Binary Classifier ...')
+        for (img1, Y ) in train_bar:
+            model.train()
             #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
-            auc=auc_softmax(model, test_loader, num_classes=6 )
-            auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)
-                
-            clean_auc.append(auc)
-            adv_auc.append(auc_adv)
+            adv_data = attack_train(img1, Y)
+            optimizer.zero_grad()            
+            out_1 = model(adv_data.cuda()) 
+            loss_ = loss(out_1,Y.cuda())  
+            loss_.backward()
+            optimizer.step()
+            total_num += adv_data.size(0)
+            total_loss += loss_.item() * adv_data.size(0)
+            total_num += train_loader.batch_size
+            total_loss += loss_.item() * train_loader.batch_size
+            train_bar.set_description(' Epoch :  {} ,   Loss: {:.4f}'.format(epoch ,  total_loss / total_num))
+        #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
+        auc=auc_softmax(model, test_loader, num_classes=6 )
+        auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)
+            
+        clean_auc.append(auc)
+        adv_auc.append(auc_adv)
     
-    df=pd.DataFrame({'Clean AUC' : clean_auc , 'Adv AUC' :adv_auc  })
-    if not os.path.exists('./Results'):
-        os.makedirs('./Results')
-    if not os.path.exists('./logs'):
-        os.makedirs('./logs')
+        df=pd.DataFrame({'Clean AUC' : clean_auc , 'Adv AUC' :adv_auc  })
+        if not os.path.exists('./Results'):
+            os.makedirs('./Results')
+        if not os.path.exists('./logs'):
+            os.makedirs('./logs')
 
 
-    
-    df.to_csv(f'./Results/Results_Fashion_{idx}.csv')
-    
-    info_to_save = {
-        'attack_eps': attack_eps,
-        'attack_steps': attack_steps,
-        'attack_alpha': attack_alpha,
-        'num_epoches': num_epoches,
-        'Loss': total_loss / total_num,   
-        'labels_to_test': labelsToKeep,
-        'clean_auc':clean_auc,
-        'adv_auc':adv_auc
         
-    }
+        df.to_csv(f'./Results/Results_Fashion_{idx}.csv')
+        
+        info_to_save = {
+            'attack_eps': attack_eps,
+            'attack_steps': attack_steps,
+            'attack_alpha': attack_alpha,
+            'num_epoches': num_epoches,
+            'Loss': total_loss / total_num,   
+            'labels_to_test': labelsToKeep,
+            'clean_auc':clean_auc,
+            'adv_auc':adv_auc
+            
+        }
 
 
-    with open('./logs/logs_Fashion_{idx}.json','w') as f:
-        json.dump(info_to_save, f)
+        with open('./logs/logs_Fashion_{idx}.json','w') as f:
+            json.dump(info_to_save, f)
             
 
 

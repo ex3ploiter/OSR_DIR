@@ -53,6 +53,13 @@ transform_32 = transforms.Compose([
             transforms.Resize([32,32]),
             transforms.ToTensor()
         ])
+
+transform_32_3channel = transforms.Compose([
+            transforms.Resize([32,32]),
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor()
+        ])
+
 transform_224 = transforms.Compose([
             transforms.Resize([224,224]),
         ])
@@ -106,7 +113,8 @@ class MyDataset_Binary(torch.utils.data.Dataset):
 
 
 def getTrainSet(labelsToKeep):
-    Fashion_train =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST', train=True, download=False, transform=transform_32)
+    Fashion_train =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
+                                , train=True, download=False, transform=transform_32_3channel)
     #######
     train_labels=[]
     images_train=[]
@@ -128,7 +136,8 @@ def getTrainSet(labelsToKeep):
     
                 
 def getTestSet(labelsToKeep):
-    Fashion_test =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST', train=False, download=False, transform=transform_32)
+    Fashion_test =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
+                               , train=False, download=False, transform=transform_32_3channel)
 
     test_labels=[]
     images_test=[]
@@ -147,8 +156,8 @@ def getTestSet(labelsToKeep):
 
 
 def getLoaders(labelsToKeep):
-    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=64, shuffle=True)
-    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=64, shuffle=False)
+    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=8, shuffle=True)
+    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=8, shuffle=False)
     
     return train_loader,test_loader
     
