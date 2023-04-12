@@ -32,15 +32,14 @@ TrainTimePGD = PGD #(fln)
 
 def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,attack_steps,attack_alpha,num_epoches):
 
-    
+    clean_auc=[]
+    adv_auc=[]
+
+
     attack_train = TrainTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps)
     attack_test = TestTimePGD(model, eps=attack_eps,alpha=attack_alpha, steps=attack_steps, num_classes=6)
     optimizer = optim.Adam(model.parameters(), lr=0.0001, weight_decay=0.00005)
-    
-    
-    clean_auc=[]
-    adv_auc=[]
-    
+
     for epoch in range(num_epoches):
             total_loss, total_num = 0.0, 0
             loss = nn.CrossEntropyLoss()
@@ -59,17 +58,10 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
                 total_num += train_loader.batch_size
                 total_loss += loss_.item() * train_loader.batch_size
                 train_bar.set_description(' Epoch :  {} ,   Loss: {:.4f}'.format(epoch ,  total_loss / total_num))
-                
-                
-                
-                
             #attack = PGD(model, eps=attack_eps,alpha= attack_alpha,steps=attack_steps, num_classes=6)
             auc=auc_softmax(model, test_loader, num_classes=6 )
-            auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)            
-            
-            
-            
-            
+            auc_adv=auc_softmax_adversarial(model, test_loader , attack_test, num_classes=6)
+                
             clean_auc.append(auc)
             adv_auc.append(auc_adv)
     
@@ -81,7 +73,7 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
 
 
     
-    df.to_csv(os.path.join(f'./Results',f'Results_Fashion_{idx}'))
+    df.to_csv(f'./Results/Results_Fashion_{idx}.csv')
     
     info_to_save = {
         'attack_eps': attack_eps,
@@ -96,7 +88,7 @@ def TrainAndTest(idx,labelsToKeep,model,train_loader,test_loader,attack_eps,atta
     }
 
 
-    with open(os.path.join(f'./logs',f'logs_Fashion_{idx}'),'w') as f:
+    with open('./logs/logs_Fashion_{idx}.json','w') as f:
         json.dump(info_to_save, f)
             
 

@@ -505,6 +505,8 @@ class Attack(object):
             for subname, subvalue in value.__dict__.get('_attacks').items():
                 attacks[name+"."+subname] = subvalue
                 
+
+
 import torch
 import torch.nn as nn
 
@@ -564,7 +566,7 @@ class TestTimePGD(Attack):
             adv_images = torch.clamp(adv_images, min=0, max=1).detach()
 
         ones = torch.ones_like(labels)
-        multipliers =  (ones - 2 * ones * (labels == self.num_classes))
+        multipliers =  (ones - 2 * ones * (labels != self.num_classes))
         
         for _ in range(self.steps):
             adv_images.requires_grad = True

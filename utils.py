@@ -44,6 +44,7 @@ import matplotlib.pyplot as plt
 from torchvision.datasets import FashionMNIST
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
+import torchvision 
 
 
 
@@ -53,6 +54,9 @@ transform_32 = transforms.Compose([
             transforms.ToTensor()
         ])
 transform_224 = transforms.Compose([
+            transforms.Resize([224,224]),
+        ])
+transform_32_tensor = transforms.Compose([
             transforms.Resize([224,224]),
         ])
 
@@ -109,13 +113,18 @@ def getTrainSet(labelsToKeep):
     for x,y in Fashion_train:
         if y in labelsToKeep:
             train_labels.append(labelsToKeep.index(y))
-            images_train.append(x)    
-    images_train_t=torch.stack(images_train)
-    
-    train_data_set_ =MyDataset_Binary(images_train_t,train_labels ,transform_224)
+            images_train.append(x) 
+            
+    exposureDataset = torchvision.datasets.ImageFolder("./one_class_train", transform=transform_32)
+    exposureSamples, _ = next(iter(DataLoader(exposureDataset, batch_size=5000, shuffle=True))) 
+    for x in exposureSamples:
+        train_labels.append(6)
+        images_train.append(x)
+        
+    images_train_t=torch.stack(images_train)                   
+    train_data_set_ =MyDataset_Binary(images_train_t,train_labels ,transform_32_tensor)
     
     return train_data_set_
-    
     
                 
 def getTestSet(labelsToKeep):
@@ -123,20 +132,19 @@ def getTestSet(labelsToKeep):
 
     test_labels=[]
     images_test=[]
-    
     for x,y in Fashion_test:
-        if y in labelsToKeep:
-            test_labels.append(labelsToKeep.index(y))
-            images_test.append(x)
-        else:
-            test_labels.append(6)
-            images_test.append(x)
-    
+      if y in labelsToKeep:
+          test_labels.append(labelsToKeep.index(y))
+          images_test.append(x)
+      else:
+          test_labels.append(6)
+          images_test.append(x)
     images_test=torch.stack(images_test)
 
-    test_data_set_ =MyDataset_Binary(images_test,test_labels ,transform_224)
+    test_data_set_ =MyDataset_Binary(images_test,test_labels ,transform_32_tensor)
     
     return test_data_set_
+
 
 def getLoaders(labelsToKeep):
     train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=8, shuffle=True)
@@ -166,9 +174,6 @@ def auc_softmax_adversarial(model, test_loader, test_attack, num_classes):
       probs = soft(output).squeeze()
       anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
       test_labels += target.detach().cpu().numpy().tolist()
-      
-      
-      
 
   test_labels = [t == num_classes for t in test_labels]
   #print(test_labels)
@@ -191,10 +196,6 @@ def auc_softmax(model, test_loader, num_classes):
         probs = soft(output).squeeze()
         anomaly_scores += probs[:, num_classes].detach().cpu().numpy().tolist()
         test_labels += target.detach().cpu().numpy().tolist()
-        
-        
-        
-        
 #epoch
   #print(test_labels)
   #print(num_classes)
