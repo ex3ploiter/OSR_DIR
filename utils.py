@@ -113,47 +113,47 @@ class MyDataset_Binary(torch.utils.data.Dataset):
 
 
 def getTrainSet(labelsToKeep):
-    Fashion_train =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
-                                , train=True, download=False, transform=transform_32_3channel)
-    #######
-    train_labels=[]
-    images_train=[]
-    for x,y in Fashion_train:
-        if y in labelsToKeep:
-            train_labels.append(labelsToKeep.index(y))
-            images_train.append(x) 
-            
-    exposureDataset = torchvision.datasets.ImageFolder("/mnt/sda3/home/ma_hadi/Imagenet30/imagenet30/one_class_train", transform=transform_32)
-    exposureSamples, _ = next(iter(DataLoader(exposureDataset, batch_size=5000, shuffle=True))) 
-    for x in exposureSamples:
-        train_labels.append(6)
-        images_train.append(x)
-        
-    images_train_t=torch.stack(images_train)                   
-    train_data_set_ =MyDataset_Binary(images_train_t,train_labels ,transform_32_tensor)
-    
-    return train_data_set_
-    
+  Fashion_train =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
+                              , train=True, download=False, transform=transform_32_3channel)
+
+  train_labels=[]
+  images_train=[]
+  for x,y in Fashion_train:
+      if y in labelsToKeep:
+          train_labels.append(labelsToKeep.index(y))
+          train_labels.append(labelsToKeep.index(y))
+          train_labels.append(labelsToKeep.index(y))
+          images_train.append(x)
+          images_train.append(x)
+          images_train.append(x) 
+          
+  exposureDataset = torchvision.datasets.ImageFolder("./one_class_train", transform=transform_32)
+  exposureSamples, _ = next(iter(DataLoader(exposureDataset, batch_size=15000, shuffle=True))) 
+  for x in exposureSamples:
+      train_labels.append(6)
+      images_train.append(x)             
+      
+  images_train_t=torch.stack(images_train)
+  train_data_set_ =MyDataset_Binary(images_train_t,train_labels ,transform_32_tensor)
+  
+  return train_data_set_
                 
 def getTestSet(labelsToKeep):
-    Fashion_test =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
-                               , train=False, download=False, transform=transform_32_3channel)
+  Fashion_test =FashionMNIST('/mnt/sda3/home/ma_hadi/ExposureExperiment_robust/.data/Datasets/FashionMNIST'
+                              , train=False, download=False, transform=transform_32_3channel)
 
-    test_labels=[]
-    images_test=[]
-    for x,y in Fashion_test:
-      if y in labelsToKeep:
-          test_labels.append(labelsToKeep.index(y))
-          images_test.append(x)
-      else:
-          test_labels.append(6)
-          images_test.append(x)
-    images_test=torch.stack(images_test)
+  test_labels=[]
+  images_test=[]
+  for x,y in Fashion_test:
+    if y in labelsToKeep:
+        test_labels.append(labelsToKeep.index(y))
+        images_test.append(x)
+    else:
+        test_labels.append(6)
+        images_test.append(x)
+  images_test=torch.stack(images_test)
 
-    test_data_set_ =MyDataset_Binary(images_test,test_labels ,transform_32_tensor)
-    
-    return test_data_set_
-
+  test_data_set_ =MyDataset_Binary(images_test,test_labels ,transform_32_tensor)
 
 def getLoaders(labelsToKeep):
     train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=8, shuffle=True)
@@ -187,7 +187,7 @@ def auc_softmax_adversarial(model, test_loader, test_attack, num_classes):
   test_labels = [t == num_classes for t in test_labels]
   #print(test_labels)
   auc = roc_auc_score(test_labels, anomaly_scores)
-  print(f'AUC Adversairal - Softmax - score is: {auc * 100}')
+  print(f'AUC Adversairal - Softmax - score on epoch {epoch} is: {auc * 100}')
   return auc
 
 def auc_softmax(model, test_loader, num_classes):
