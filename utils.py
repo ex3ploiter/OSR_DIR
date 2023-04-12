@@ -115,7 +115,7 @@ def getTrainSet(labelsToKeep):
             train_labels.append(labelsToKeep.index(y))
             images_train.append(x) 
             
-    exposureDataset = torchvision.datasets.ImageFolder("./one_class_train", transform=transform_32)
+    exposureDataset = torchvision.datasets.ImageFolder("/mnt/sda3/home/ma_hadi/Imagenet30/imagenet30/one_class_train", transform=transform_32)
     exposureSamples, _ = next(iter(DataLoader(exposureDataset, batch_size=5000, shuffle=True))) 
     for x in exposureSamples:
         train_labels.append(6)
@@ -147,8 +147,8 @@ def getTestSet(labelsToKeep):
 
 
 def getLoaders(labelsToKeep):
-    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=8, shuffle=True)
-    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=8, shuffle=False)
+    train_loader = DataLoader(getTrainSet(labelsToKeep), batch_size=64, shuffle=True)
+    test_loader = DataLoader(getTestSet(labelsToKeep), batch_size=64, shuffle=False)
     
     return train_loader,test_loader
     
